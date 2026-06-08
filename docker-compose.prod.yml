@@ -1,0 +1,117 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: todo-db-prod
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  redis:
+    image: redis:alpine
+    container_name: todo-redis-prod
+    volumes:
+      - redis_data:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: todo-backend-prod
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings_prod
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=False
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    networks:
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - backend-static:/staticfiles # shared with web for static files
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: todo-celery-worker-prod
+    command: celery -A core worker --loglevel=info --concurrency=4
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings_prod
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    networks:
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Single web service: serves React static files + nginx proxy
+  web:
+    build:
+      context: . # project root (where frontend & nginx folders are)
+      dockerfile: nginx/Dockerfile.prod # we'll create this file
+    container_name: todo-web-prod
+    ports:
+      - "80:80"
+      - "443:443" # for SSL (optional)
+    volumes:
+      - backend-static:/staticfiles # mount Django static files
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+  redis_data:
+  backend-static:
+
+networks:
+  internal:
+    driver: bridge

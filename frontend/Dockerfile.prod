@@ -1,0 +1,11 @@
+# frontend/Dockerfile.prod (builder only)
+FROM docker.iranserver.com/node:20-alpine AS builder
+RUN npm config set registry https://mirror2.chabokan.net/npm/ && \
+    npm config set strict-ssl false
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci   # install all dependencies (including dev for build)
+COPY . .
+RUN npm run build   # output to /app/dist
+
+# No second stage – we will use the built files in a volume or copy directly

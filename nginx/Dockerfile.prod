@@ -1,0 +1,14 @@
+# Stage 1: build React
+FROM docker.iranserver.com/node:20-alpine AS builder
+RUN npm config set registry https://mirror2.chabokan.net/npm/ && \
+    npm config set strict-ssl false
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: nginx serving both static files and proxy
+FROM docker.iranserver.com/nginx:stable-alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
