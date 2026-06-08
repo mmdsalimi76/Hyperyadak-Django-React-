@@ -62,3 +62,6 @@ desktop.ini
 *.key
 *.crt
 *.p12
+
+# ----- VPS Manager -----
+/Vps Manager/
