@@ -65,3 +65,6 @@ desktop.ini
 
 # ----- VPS Manager -----
 /Vps Manager/
+
+# ----- nginx -----
+/nginx/
