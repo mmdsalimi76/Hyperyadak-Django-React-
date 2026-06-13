@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Copy requirements and install
-COPY requirements.txt /app/
+COPY requirements-dev.txt /app/
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements-dev.txt
 

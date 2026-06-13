@@ -90,7 +90,7 @@ function ProductBrandSection({ productBrands = [] }) {
   }
 
   return (
-    <section className="py-12 bg-white w-full overflow-hidden border-y border-gray-100/60">
+    <section className="py-12  w-full overflow-hidden border-y border-gray-100/60">
       <div className="w-full px-4 md:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 border-b border-[#c5c5d3]/10 pb-4 w-full">

@@ -91,7 +91,7 @@ function AboutPage() {
             <div className="absolute -left-16 -bottom-16 w-48 h-48 bg-[#0058be]/5 rounded-full blur-3xl pointer-events-none" />
 
             <div class="flex flex-col items-center justify-center text-center">
-              <img src="/logo.png" alt="Logo" class="w-20 h-auto mb-4" />
+              <img src="/logo.webp" alt="Logo" class="w-20 h-auto mb-4" />
 
               <p class="text-2xl font-black text-[#00236f]">بیش از ۱۵ سال</p>
               <p class="text-[#475569] text-sm font-medium mt-1">

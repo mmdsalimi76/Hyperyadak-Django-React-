@@ -5,7 +5,7 @@ import {
   getStatusText,
   getStatusBadge,
   formatDate,
-} from "../utils/dashboardUtils.js";
+} from "../Utils/dashboardUtils.js";
 
 function OrdersTab({ orders, onPayOrder, onCancelOrder }) {
   const [expandedOrderId, setExpandedOrderId] = useState(null);

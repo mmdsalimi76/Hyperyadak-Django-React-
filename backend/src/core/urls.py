@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from decouple import config
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -40,13 +40,13 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=[permissions.AllowAny],
 )
-
+ADMIN_URL = config('ADMIN_URL', default='admin/')
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/user/', CurrentUserView.as_view(), name='current_user'),  
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path(f'{ADMIN_URL}', admin.site.urls),
+    path('user/', CurrentUserView.as_view(), name='current_user'),  
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('accounts.urls')),
     path('payments/', include('payments.urls')),

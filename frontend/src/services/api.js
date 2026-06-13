@@ -3,7 +3,8 @@ import axios from "axios";
 
 // Base configuration
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  import.meta.env.VITE_API_BASE_URL?.trim() ||
+  (import.meta.env.PROD ? "/api" : "http://localhost:8000");
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -41,10 +42,9 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem("refresh_token");
-        const { data } = await axios.post(
-          `${API_BASE_URL}/api/token/refresh/`,
-          { refresh: refreshToken },
-        );
+        const { data } = await axios.post(`${API_BASE_URL}/token/refresh/`, {
+          refresh: refreshToken,
+        });
         if (data.access) {
           localStorage.setItem("access_token", data.access);
           originalRequest.headers.Authorization = `Bearer ${data.access}`;
@@ -65,7 +65,7 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (phone_number, password) => {
     try {
-      const response = await api.post("/api/token/", {
+      const response = await api.post("/token/", {
         phone_number,
         password,
       });
@@ -90,7 +90,7 @@ export const authAPI = {
 
   refreshToken: async () => {
     const refresh = localStorage.getItem("refresh_token");
-    const response = await api.post("/api/token/refresh/", { refresh });
+    const response = await api.post("/token/refresh/", { refresh });
     if (response.data.access) {
       localStorage.setItem("access_token", response.data.access);
       api.defaults.headers.common.Authorization = `Bearer ${response.data.access}`;
@@ -184,7 +184,7 @@ export const cartAPI = {
 
   // Update quantity of a cart item
   updateCartItem: async (itemId, quantity) => {
-    const response = await api.put(`/cart/api/v1/update/${itemId}/`, {
+    const response = await api.put(`/api/v1/update/${itemId}/`, {
       quantity,
     });
     return response.data;

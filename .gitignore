@@ -68,3 +68,7 @@ desktop.ini
 
 # ----- nginx -----
 /nginx/
+# ----- scripts (vps manager) -----
+/scripts/
+# ----- ssl -----
+/certs/

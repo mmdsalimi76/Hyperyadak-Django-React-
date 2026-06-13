@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 from django.conf.global_settings import AUTH_USER_MODEL, MEDIA_ROOT, MEDIA_URL, STATIC_ROOT, STATICFILES_DIRS
 from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +28,6 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config("DEBUG",cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS',cast=lambda v: [s.strip() for s in v.split(',')],default='*')
-
 
 # Application definition
 
@@ -136,14 +135,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = os.environ.get('STATIC_ROOT', BASE_DIR / 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'staticfiles',
-]
+staticfiles_dir = BASE_DIR / 'staticfiles'
+if staticfiles_dir.exists():
+    STATICFILES_DIRS = [staticfiles_dir]
 
 
 # Default primary key field type
@@ -174,12 +173,8 @@ REST_FRAMEWORK = {
 
 # React setting
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:3000",
-]
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='').split(',')
+
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -208,12 +203,10 @@ CORS_ALLOW_METHODS = [
 
 # CSRF
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:3000",
-]
+
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='').split(',')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
 
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = False  

@@ -137,8 +137,10 @@ export default function Header() {
             className="font-bold text-xl text-[#00236f] tracking-tight flex items-center gap-1"
           >
             <LogoIcon className="w-11 h-11" />
-            هایپر
-            <span className="text-[#0058be] font-normal">یدک</span>
+            <span className="hidden md:inline">
+              هایپر
+              <span className="text-[#0058be] font-normal">یدک</span>
+            </span>
           </Link>
         </div>
 

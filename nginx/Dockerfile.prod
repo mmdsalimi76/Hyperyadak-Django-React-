@@ -4,6 +4,7 @@ RUN npm config set registry https://mirror2.chabokan.net/npm/ && \
     npm config set strict-ssl false
 WORKDIR /app
 COPY frontend/package*.json ./
+ENV VITE_API_BASE_URL=/api
 RUN npm ci
 COPY frontend/ ./
 RUN npm run build

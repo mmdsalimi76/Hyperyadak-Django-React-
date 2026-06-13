@@ -6,32 +6,9 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
-    proxy: {
-      "/products/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-      "/cart/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-      "/accounts/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-      "/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-      "/payments/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-      "/tickets/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-    },
+    // Proxy is only needed for local dev; production uses same origin (/api)
+    // The proxy configuration has been removed.
+
     watch: {
       usePolling: true,
       interval: 100,

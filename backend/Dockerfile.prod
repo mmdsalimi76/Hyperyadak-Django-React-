@@ -5,7 +5,7 @@ FROM docker.iranserver.com/python:3.14-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_INDEX_URL=https://pypi.devneeds.ir/simple/ \
-    DJANGO_SETTINGS_MODULE=core.settings_prod \
+    DJANGO_SETTINGS_MODULE=core.settings \
     DEBUG=False
 
 # Create a non‑root user for running the application (security)
@@ -28,12 +28,23 @@ COPY src /app/
 RUN mkdir -p /staticfiles && \
     chown -R django:django /app /staticfiles
 
-# Collect static files – this expects your STATIC_ROOT is set to '/staticfiles'
+# Temporary dummy secret for static collection (overridden at runtime)
+ENV SECRET_KEY=dummy-key-for-build-only
+ENV SMS_IR_API_KEY="kcIO0EnMsEVFJCgeQxF82KTiAzn2G2eaFirpsJZSnxEpk5SF"
+
+
+ENV STATIC_ROOT=/staticfiles
+
 RUN python manage.py collectstatic --noinput
 
+# After creating the django user, add these lines:
+RUN mkdir -p /home/django && chown -R django:django /home/django
 # Switch to non‑root user
 USER django
+ENV HOME=/home/django
 
+ENV PYTHONPATH=/app 
+WORKDIR /app
 # Expose the port that Gunicorn will listen on
 EXPOSE 8000
 
